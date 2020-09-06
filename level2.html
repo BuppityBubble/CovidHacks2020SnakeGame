@@ -1,0 +1,307 @@
+<html>
+<head>
+  <link href="style.css" type="text/css" rel="stylesheet">
+  
+	<title>  Covid Info Station </title>
+	<style>
+  html, body {
+    height: 100%;
+    margin: 0;
+  }
+
+  body {
+
+   background-image: url('Covid1.jpg');
+   background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+  canvas {
+    border: 12px solid white;
+  }
+  </style>
+</head>
+
+
+    <body> 
+<center>
+		<h1 style="background-color:rgba(42, 188, 255, 1); font-size:500%; font-family:Monospace">Covid Snake Game </h1>
+	</header></center>
+
+
+<center><table><tr><td>
+
+
+<div style="color:white;font-family:arial":>
+  <h3> Instructions</h3>
+  <ol >
+    <li>Use the arrow keys to move.</li>
+    <li>Grab the mask(blue blocks)
+    <li>Keep clear of the corona virus(green blocks)
+    <li>HAVE FUN!!!!
+  </ol>
+</div>
+    </body>
+    </td>
+
+    <td>
+    <body>
+<center><canvas width="400" height="400" id="game"></canvas>
+<script>
+var canvas = document.getElementById('game');
+var context = canvas.getContext('2d');
+
+
+
+var grid = 16;
+var count = 0;
+  
+var snake = {
+  x: 160,
+  y: 160,
+  
+  // snake velocity. moves one grid length every frame in either the x or y direction
+  dx: grid,
+  dy: 0,
+  
+  // keep track of all grids the snake body occupies
+  cells: [],
+  
+  // length of the snake. grows when eating an apple
+  maxCells: 4
+};
+var apple = {
+  x: 320,
+  y: 320
+};
+var virus = {
+  x: 160,
+  y: 80
+};
+var virus2 = {
+  x: 240,
+  y: 320
+};
+var virus3 = {
+  x: 80,
+  y: 240
+};
+var virus4 = {
+  x: 320,
+  y: 240
+};
+
+// get random whole numbers in a specific range
+// @see https://stackoverflow.com/a/1527820/2124254
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
+// game loop
+function loop() {
+  requestAnimationFrame(loop);
+
+  // slow game loop to 15 fps instead of 60 (60/15 = 4)
+  if (++count < 4) {
+    return;
+  }
+
+  count = 0;
+  context.clearRect(0,0,canvas.width,canvas.height);
+
+  // move snake by it's velocity
+  snake.x += snake.dx;
+  snake.y += snake.dy;
+
+  // wrap snake position horizontally on edge of screen
+  if (snake.x < 0) {
+    snake.x = canvas.width - grid;
+  }
+  else if (snake.x >= canvas.width) {
+    snake.x = 0;
+  }
+  
+  // wrap snake position vertically on edge of screen
+  if (snake.y < 0) {
+    snake.y = canvas.height - grid;
+  }
+  else if (snake.y >= canvas.height) {
+    snake.y = 0;
+  }
+
+  // keep track of where snake has been. front of the array is always the head
+  snake.cells.unshift({x: snake.x, y: snake.y});
+
+  // remove cells as we move away from them
+  if (snake.cells.length > snake.maxCells) {
+    snake.cells.pop();
+  }
+
+  // draw apple
+  context.fillStyle = 'deepskyblue';
+  context.fillRect(apple.x, apple.y, grid-1, grid-1);
+
+//draw virus
+context.fillStyle = 'mediumseagreen';
+context.fillRect(virus.x, virus.y, grid-1, grid-1);
+
+//draw virus2
+context.fillStyle = 'mediumseagreen';
+context.fillRect(virus2.x, virus2.y, grid-1, grid-1);
+
+//draw virus3
+context.fillStyle = 'mediumseagreen';
+context.fillRect(virus3.x, virus3.y, grid-1, grid-1);
+
+//draw virus4
+context.fillStyle = 'mediumseagreen';
+context.fillRect(virus4.x, virus4.y, grid-1, grid-1);
+
+  // draw snake one cell at a time
+  context.fillStyle = 'yellow';
+  snake.cells.forEach(function(cell, index) {
+    
+    // drawing 1 px smaller than the grid creates a grid effect in the snake body so you can see how long it is
+    context.fillRect(cell.x, cell.y, grid-1, grid-1);  
+
+    // snake ate apple
+    if (cell.x === apple.x && cell.y === apple.y) {
+      snake.maxCells++;
+
+      // canvas is 400x400 which is 25x25 grids 
+      apple.x = getRandomInt(0, 25) * grid;
+      apple.y = getRandomInt(0, 25) * grid;
+    }
+
+
+
+    // check collision with all cells after this one (modified bubble sort)
+    for (var i = index + 1; i < snake.cells.length; i++) {
+      
+      // snake occupies same space as a body part. reset game
+      if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
+        snake.x = 160;
+        snake.y = 160;
+        snake.cells = [];
+        snake.maxCells = 4;
+        snake.dx = grid;
+        snake.dy = 0;
+
+        apple.x = getRandomInt(0, 25) * grid;
+        apple.y = getRandomInt(0, 25) * grid;
+      }
+
+// snake eats virus
+      if (cell.x === virus.x && cell.y === virus.y) {
+        snake.x = 160;
+        snake.y = 160;
+        snake.cells = [];
+        snake.maxCells = 4;
+        snake.dx = grid;
+        snake.dy = 0;
+
+        virus.x = getRandomInt(0, 25) * grid;
+        virus.y = getRandomInt(0, 25) * grid;
+      }
+// snake eats virus2
+      if (cell.x === virus2.x && cell.y === virus2.y) {
+        snake.x = 160;
+        snake.y = 160;
+        snake.cells = [];
+        snake.maxCells = 4;
+        snake.dx = grid;
+        snake.dy = 0;
+
+        virus2.x = getRandomInt(0, 25) * grid;
+        virus2.y = getRandomInt(0, 25) * grid;
+      }
+// snake eats virus3
+      if (cell.x === virus3.x && cell.y === virus3.y) {
+        snake.x = 160;
+        snake.y = 160;
+        snake.cells = [];
+        snake.maxCells = 4;
+        snake.dx = grid;
+        snake.dy = 0;
+
+        virus3.x = getRandomInt(0, 25) * grid;
+        virus3.y = getRandomInt(0, 25) * grid;
+      }
+// snake eats virus4
+      if (cell.x === virus4.x && cell.y === virus4.y) {
+        snake.x = 160;
+        snake.y = 160;
+        snake.cells = [];
+        snake.maxCells = 4;
+        snake.dx = grid;
+        snake.dy = 0;
+
+        virus4.x = getRandomInt(0, 25) * grid;
+        virus4.y = getRandomInt(0, 25) * grid;
+      }
+
+    }
+  });
+}
+
+// listen to keyboard events to move the snake
+document.addEventListener('keydown', function(e) {
+  // prevent snake from backtracking on itself by checking that it's 
+  // not already moving on the same axis (pressing left while moving
+  // left won't do anything, and pressing right while moving left
+  // shouldn't let you collide with your own body)
+  
+  // left arrow key
+  if (e.which === 37 && snake.dx === 0) {
+    snake.dx = -grid;
+    snake.dy = 0;
+  }
+  // up arrow key
+  else if (e.which === 38 && snake.dy === 0) {
+    snake.dy = -grid;
+    snake.dx = 0;
+  }
+  // right arrow key
+  else if (e.which === 39 && snake.dx === 0) {
+    snake.dx = grid;
+    snake.dy = 0;
+  }
+  // down arrow key
+  else if (e.which === 40 && snake.dy === 0) {
+    snake.dy = grid;
+    snake.dx = 0;
+  }
+});
+
+// start the game
+requestAnimationFrame(loop);
+</script></center>
+  
+</td>
+<td>
+<a href="index.html"> <img src="New Project.png"> </a> <br />
+<a href="level2.html"> <img src="level2.png"> </a> <br />
+<a href="level3.html"> <img src="level3.png"> </a> <br />
+<br />
+<p>Level 2: Shopping at Costco</p>
+</td>
+</table></center>
+
+    </body>
+    
+<body>
+<h2 style="background-color:deepskyblue;"><center>Wear a Mask!</center></h2>
+<center><p>Cover your mouth and nose with a mask when around others <br />
+You could spread Covid-19 to others even if you do NOT feel sick <br />
+The mask is meant to protect other people in case you are infected <br />
+Everyone should wear a mask in public settings and when around people who don’t live in your household, especially when other social distancing measures are difficult to maintain <br />
+Continue to keep about 6 feet between yourself and others. The <strong> mask </strong>is not a substitute for social distancing
+
+
+</p>
+<img src="Mask.jpg" alt="Mask"></center>
+
+
+</body>
+</html>
